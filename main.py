@@ -9,8 +9,11 @@ NUMBER_OF_MINES = 10
 tiles = pygame.sprite.Group()
 clock = pygame.time.Clock()
 
-imagenames = ["empty", "1", "2", "3", "4", "5", "6", "7", "8", "flag", "mine", "tile"]
-images = [pygame.image.load(f"files/{i}.png").convert_alpha() for i in imagenames]
+imagenames = ["empty", "1", "2", "3", "4",
+              "5", "6", "7", "8", "flag", "mine", "tile"]
+images = [pygame.image.load(
+    f"files/{i}.png").convert_alpha() for i in imagenames]
+
 
 class Tile:
     def __init__(self, x, y):
@@ -20,47 +23,50 @@ class Tile:
         self.hidden = True
         self.x = x
         self.y = y
-    
+
     def set_mine(self):
         if self.state == 10:
             choice(choice(board)).set_mine()
         else:
             self.state = 10
-            
+
     def determine_mines(self):
         if self.state == 0:
             total = 0
             for i in range(-1, 2):
                 for j in range(-1, 2):
-                    xpos = self.x + i
-                    ypos = self.y + j
-                    if xpos > 0 and ypos > 0 and i * j:
+                    x = self.x + i
+                    y = self.y + j
+                    if x >= 0 and y >= 0:
                         try:
-                            if board[xpos][ypos].state == 10:
+                            if board[y][x].state == 10:
                                 total += 1
                         except IndexError:
                             pass
             self.state = total
-    
+
     def reveal(self):
+        self.hidden = False
         if self.state == 0:
             for i in range(-1, 2):
                 for j in range(-1, 2):
-                    xpos = self.x + i
-                    ypos = self.y + j
-                    if xpos > 0 and ypos > 0 and i * j:
+                    x = self.x + i
+                    y = self.y + j
+                    if x >= 0 and y >= 0:
                         try:
-                            if board[xpos][ypos].state in range(9):
-                                board[xpos][ypos].reveal()
+                            tile = board[y][x]
+                            if tile.state in range(9) and tile.hidden == True:
+                                tile.reveal()
                         except IndexError:
                             pass
-        self.hidden = False
-    
+
     def draw(self):
         if self.hidden:
             screen.blit(images[-1], (self.x * 25, self.y * 25 + 50))
         else:
+            screen.blit(images[0], (self.x * 25, self.y * 25 + 50))
             screen.blit(images[self.state], (self.x * 25, self.y * 25 + 50))
+
 
 board = [[Tile(i, j) for i in range(BOARDHEIGHT)] for j in range(BOARDWIDTH)]
 for i in range(NUMBER_OF_MINES):
@@ -74,7 +80,12 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             quit()
-    
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            x = event.pos[0] // 25
+            y = (event.pos[1] - 50) // 25
+            if x >= 0 and y >= 0:
+                board[y][x].reveal()
+
     for row in board:
         for tile in row:
             tile.draw()
