@@ -85,8 +85,8 @@ def process_input(pos, reveal):
                     tile.flagged = False
                 else:
                     tile.flagged = True
-    count = sum([sum([int(j.flagged) for j in i]) for i in board])
-    if count == NUMBER_OF_MINES:
+    won = all([all([j.flagged if j.state == 10 else True for j in i]) for i in board])
+    if won:
         quit()
 
 board = [[Tile(i, j) for i in range(BOARDWIDTH)] for j in range(BOARDHEIGHT)]
