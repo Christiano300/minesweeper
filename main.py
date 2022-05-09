@@ -10,7 +10,7 @@ screen = pygame.display.set_mode(size)
 game_running = True
 status = 0  # 0 means nothing, 1 means won and -1 means lost
 
-NUMBER_OF_MINES = 30
+NUMBER_OF_MINES = 200
 tiles = pygame.sprite.Group()
 clock = pygame.time.Clock()
 
@@ -80,8 +80,8 @@ def process_input(pos: list, reveal: bool) -> int:
         if reveal:
             if not tile.flagged:
                 tile.reveal()
-            if tile.state == 10:
-                return -1
+                if tile.state == 10:
+                    return -1
         else:
             if tile.hidden:
                 if tile.flagged:
@@ -89,7 +89,7 @@ def process_input(pos: list, reveal: bool) -> int:
                 else:
                     tile.flagged = True
 
-    won = all([all([j.flagged for j in i if j.state == 10]) for i in board])
+    won = all([all([not j.hidden for j in i if j.state != 10]) for i in board])
     return int(won)
 
 
@@ -129,11 +129,14 @@ while True:
                 shift_pressed = True
             elif event.key == pygame.K_r:
                 if shift_pressed:
-                    if game_running:
-                        for i in board:
-                            for j in i:
-                                if j.state == 10 and not j.hidden:
-                                    j.hidden = True
+                    for i in board:
+                        for j in i:
+                            if j.state == 10 and not j.hidden:
+                                j.hidden = True
+                    if status == -1:
+                        game_running = True
+                        status = 0
+                    process_input([-1, -1], False)
                 else:
                     for row in board:
                         for tile in row:
@@ -159,10 +162,10 @@ while True:
         game_running = False
         if status == 1:
             screen.blit(pygame.font.Font(None, 35).render(
-                "You won!", True, (20, 180, 0)), (5, 50))
+                "You won!", True, (20, 180, 0)), (5, 15))
         else:
-            screen.blit(pygame.font.Font(None, 30).render(
-                "You lost!", True, (230, 10, 10)), (5, 50))
+            screen.blit(pygame.font.Font(None, 35).render(
+                "You lost!", True, (230, 10, 10)), (5, 15))
 
     pygame.display.update()
     clock.tick(60)
