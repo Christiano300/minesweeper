@@ -2,13 +2,13 @@ import pygame
 from random import choice
 pygame.init()
 
-BOARDWIDTH = 5
-BOARDHEIGHT = 5
+BOARDWIDTH = 20
+BOARDHEIGHT = 20
 shift_pressed = False
 size = width, height = BOARDWIDTH * 25, BOARDHEIGHT * 25 + 50
 screen = pygame.display.set_mode(size)
 
-NUMBER_OF_MINES = 1
+NUMBER_OF_MINES = 30
 tiles = pygame.sprite.Group()
 clock = pygame.time.Clock()
 
